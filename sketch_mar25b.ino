@@ -40,6 +40,11 @@ void setup() {
   Wire.begin();
   setupWifi();
   setupMPU();
+  while (Serial.available() > 0)                  //need to be fixed
+   if (gps.encode(Serial.read())){
+     Serial.println("Reading GPS.");
+     getCoordinate();      
+   }  
   mqttClient.setServer(mqtt_test_server, 1883);
 //client.setServer(mqtt_main_server, 1883);
 //client.setCallback(callback);  
@@ -52,10 +57,11 @@ void loop() {
   delay(10);  
    
   readAndPublishData();   
-  //while (Serial.available() > 0)
+  //while (Serial.available() > 0){
+    //Serial.println("Reading GPS.");
     //if (gps.encode(Serial.read()))
-       //displayInfo();      
-    
+       //getCoordinate();      
+  //}
 delay(100);
 }
 
@@ -191,8 +197,8 @@ void readAndPublishData() {
       JsonObject& data = JSONencoder.createNestedObject("data");
       data.set("X-Axis",gForceX);
       data.set("Y-Axis",gForceY);
-      data.set("Lat","-0.00");
-      data.set("Long","-0.00");
+      data.set("Lat",gps.location.lat(), 6);
+      data.set("Long",gps.location.lng(), 6);
       char JSONmessageBuffer[100];
       JSONencoder.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
       Serial.println(JSONmessageBuffer);
@@ -201,6 +207,7 @@ void readAndPublishData() {
       mqttClient.publish("finalProject/MPU", JSONmessageBuffer);      
       delay(1000);
       Serial.println("-Sent.");
+      reconnect();
     } else if( gForceY > 0.50 || gForceY < -0.50 ) {
       Serial.println("[TEST] Front-Side Accident Occured");
       delay(1000);
@@ -211,8 +218,8 @@ void readAndPublishData() {
       JsonObject& data = JSONencoder.createNestedObject("data");
       data.set("X-Axis",gForceX);
       data.set("Y-Axis",gForceY);
-      data.set("Lat","-0.00");
-      data.set("Long","-0.00");
+      data.set("Lat",gps.location.lat(), 6);
+      data.set("Long",gps.location.lng(), 6);
       char JSONmessageBuffer[100];
       JSONencoder.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
       Serial.println(JSONmessageBuffer);
@@ -220,7 +227,9 @@ void readAndPublishData() {
       Serial.println("Publishing Data...");
       mqttClient.publish("finalProject/MPU", JSONmessageBuffer);      
       delay(1000);
-      Serial.println("-Sent.");    }
+      Serial.println("-Sent.");    
+      reconnect();
+    }
   }
 
 /*
@@ -279,7 +288,7 @@ void getCoordinate()
   {
     Serial.print(F("INVALID"));
   }
-/*
+
   Serial.print(F("  Date/Time: "));
   if (gps.date.isValid())
   {
@@ -315,6 +324,6 @@ void getCoordinate()
   }
 
   Serial.println();
-*/
+
 }
 
