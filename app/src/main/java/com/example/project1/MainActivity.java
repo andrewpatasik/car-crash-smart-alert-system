@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,19 +28,20 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONObject;
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
     Button button;
     MqttAndroidClient client;
-//    TextView textView;
+    TextView textView;
     GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
- //       textView = findViewById(R.id.textView);
-        button = findViewById(R.id.connect_mqtt);
+        //textView = findViewById(R.id.textView);
+        button = findViewById(R.id.button_sub);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapView);
         mapFragment.getMapAsync(this);
@@ -48,7 +50,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String topic = "test";
+                String topic = "finalProject/MPU";
                 int Qos = 1;
                 try {
 //                        final MqttMessage msg = new MqttMessage();
@@ -132,7 +134,15 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
- //           textView.setText(message.toString());
+            byte[] msg = message.getPayload();
+            JSONObject jsonmsg = new JSONObject(new String(message.getPayload()));
+            JSONObject getData = jsonmsg.getJSONObject("data");
+            String getX = getData.getString("X-Axis");
+            String getY = getData.getString("Y-Axis");
+            String getLat = getData.getString("Lat");
+            String getLong = getData.getString("Long");
+
+            //textView.setText(getX);
             }
 
             @Override
