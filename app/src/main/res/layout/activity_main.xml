@@ -12,7 +12,6 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="430dp"
-        tools:context=".MainActivity"
         />
 
     <HorizontalScrollView
@@ -80,11 +79,12 @@
                             </ImageView>
 
                             <TextView
+                                android:id="@+id/tv_x_value"
                                 android:textSize="23dp"
                                 android:textColor="#ffffff"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="-1.00">
+                                android:text="0.00">
 
                             </TextView>
 
@@ -119,11 +119,12 @@
                             </ImageView>
 
                             <TextView
-                                android:textSize="23dp"
-                                android:textColor="#ffffff"
+                                android:id="@+id/tv_y_value"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="1.00">
+                                android:text="0.00"
+                                android:textColor="#ffffff"
+                                android:textSize="23dp">
 
                             </TextView>
 
@@ -155,11 +156,12 @@
                             </TextView>
 
                             <TextView
-                                android:textSize="24dp"
+                                android:id="@+id/tv_crash_pos"
+                                android:textSize="22dp"
                                 android:textColor="#ffffff"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="TABRAKAN DEPAN">
+                                android:text="TIDAK ADA DATA">
 
                             </TextView>
 
@@ -276,7 +278,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Subcribe">
+            android:text="Subscribe">
 
         </Button>
 

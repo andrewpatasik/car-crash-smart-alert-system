@@ -31,16 +31,18 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONObject;
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
+    TextView tv_x_value;
+    TextView tv_y_value;
     Button button;
     MqttAndroidClient client;
-    TextView textView;
     GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //textView = findViewById(R.id.textView);
+        tv_x_value = findViewById(R.id.tv_x_value);
+        tv_y_value = findViewById(R.id.tv_y_value);
         button = findViewById(R.id.button_sub);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapView);
@@ -139,10 +141,17 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             JSONObject getData = jsonmsg.getJSONObject("data");
             String getX = getData.getString("X-Axis");
             String getY = getData.getString("Y-Axis");
-            String getLat = getData.getString("Lat");
-            String getLong = getData.getString("Long");
+            Double getLat = getData.getDouble("Lat");
+            Double getLong = getData.getDouble("Long");
 
-            //textView.setText(getX);
+            tv_x_value.setText(getX);
+            tv_y_value.setText(getY);
+
+            LatLng sydney = new LatLng(getLat,getLong);
+
+                mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
             }
 
             @Override
@@ -157,8 +166,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Add a marker in Sydney, Australia, and move the camera.
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        //LatLng sydney = new LatLng(-34, 151);
+
     }
 }
