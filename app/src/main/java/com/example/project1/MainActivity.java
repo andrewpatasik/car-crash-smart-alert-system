@@ -33,7 +33,6 @@ import org.json.JSONObject;
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
     TextView tv_x_value;
     TextView tv_y_value;
-    Button button;
     MqttAndroidClient client;
     GoogleMap mMap;
 
@@ -41,48 +40,15 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         tv_x_value = findViewById(R.id.tv_x_value);
         tv_y_value = findViewById(R.id.tv_y_value);
-        button = findViewById(R.id.button_sub);
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapView);
         mapFragment.getMapAsync(this);
+
         startMqtt();
-
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String topic = "finalProject/MPU";
-                int Qos = 1;
-                try {
-//                        final MqttMessage msg = new MqttMessage();
-                    IMqttToken subToken = client.subscribe(topic,Qos);
-                    subToken.setActionCallback(new IMqttActionListener() {
-                        @Override
-                        public void onSuccess(IMqttToken asyncActionToken) {
-                            // The message was published
-                            Log.d("MQTT", "Subscribed");
-//                                Log.d("MQTT", msg.toString());
-//                                textView.setText(msg.toString());
-                        }
-
-                        @Override
-                        public void onFailure(IMqttToken asyncActionToken,
-                                              Throwable exception) {
-                            // The subscription could not be performed, maybe the user was not
-                            // authorized to subscribe on the specified topic e.g. using wildcards
-                            Log.d("MQTT", "Re-subscribed");
-
-                        }
-                    });
-                } catch (MqttException e) {
-                    e.printStackTrace();
-                }
-
-
-            }
-        });
-
     }
 
     protected void startMqtt(){
@@ -101,19 +67,34 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     Toast.makeText(MainActivity.this,"connected",Toast.LENGTH_LONG).show();
                     Log.d("MQTT", "onSuccess");
 
-                    // Now, try to publish a message
-//                            String msg = "Test connection from UI";
-//                            try
-//                            {
-//                                MqttMessage message = new MqttMessage();
-//                                message.setQos(1);
-//                                message.setPayload(msg.getBytes());
-//                                client.publish("test", message);
-//                            }
-//                            catch (MqttException e)
-//                            {
-//                                Log.d(getClass().getCanonicalName(), "Publish failed with reason code = " + e.getReasonCode());
-//                            }
+                    // Initialize Subscribe process
+                    String topic = "finalProject/MPU";
+                    int Qos = 1;
+                    try {
+//                        final MqttMessage msg = new MqttMessage();
+                        IMqttToken subToken = client.subscribe(topic,Qos);
+                        subToken.setActionCallback(new IMqttActionListener() {
+                            @Override
+                            public void onSuccess(IMqttToken asyncActionToken) {
+                                // The message was published
+                                Log.d("MQTT", "Subscribed");
+//                                Log.d("MQTT", msg.toString());
+//                                textView.setText(msg.toString());
+                            }
+
+                            @Override
+                            public void onFailure(IMqttToken asyncActionToken,
+                                                  Throwable exception) {
+                                Toast.makeText(MainActivity.this,"Failed to subscribe",Toast.LENGTH_LONG).show();
+                                // The subscription could not be performed, maybe the user was not
+                                // authorized to subscribe on the specified topic e.g. using wildcards
+                                Log.d("MQTT", "Failed to subscribe");
+
+                            }
+                        });
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
@@ -162,11 +143,44 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
         // Add a marker in Sydney, Australia, and move the camera.
         //LatLng sydney = new LatLng(-34, 151);
 
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        client.unregisterResources();
+        client.close();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
     }
 }

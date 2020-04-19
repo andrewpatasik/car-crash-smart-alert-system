@@ -11,7 +11,7 @@
         android:id="@+id/mapView"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="430dp"
+        android:layout_height="400dp"
         />
 
     <HorizontalScrollView
@@ -237,23 +237,7 @@
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
 
-                            <TextView
-                                android:textSize="12dp"
-                                android:textColor="#ffffff"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Posisi Terakhir">
 
-                            </TextView>
-
-                            <TextView
-                                android:textSize="24dp"
-                                android:textColor="#ffffff"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Green Lake City">
-
-                            </TextView>
 
                         </LinearLayout>
 
@@ -272,15 +256,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center">
-        <Button
 
-            android:id="@+id/button_sub"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Subscribe">
-
-        </Button>
 
     </LinearLayout>
 
