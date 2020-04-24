@@ -2,38 +2,26 @@ package com.example.project1;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
-
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.example.project1.helper.mqttHelper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONObject;
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
+    mqttHelper mqttConnect;
     TextView tv_x_value;
     TextView tv_y_value;
-    MqttAndroidClient client;
+    TextView tv_crash_pos;
     GoogleMap mMap;
 
     @Override
@@ -43,6 +31,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         tv_x_value = findViewById(R.id.tv_x_value);
         tv_y_value = findViewById(R.id.tv_y_value);
+        tv_crash_pos = findViewById(R.id.tv_crash_pos);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapView);
@@ -51,65 +40,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         startMqtt();
     }
 
-    protected void startMqtt(){
-        String clientId = MqttClient.generateClientId();
-        MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
-
-        client = new MqttAndroidClient(MainActivity.this, "tcp://192.168.0.106:1883",
-                clientId);
-
-        try {
-            IMqttToken token = client.connect();
-            token.setActionCallback(new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    // We are connected
-                    Toast.makeText(MainActivity.this,"connected",Toast.LENGTH_LONG).show();
-                    Log.d("MQTT", "onSuccess");
-
-                    // Initialize Subscribe process
-                    String topic = "finalProject/MPU";
-                    int Qos = 1;
-                    try {
-//                        final MqttMessage msg = new MqttMessage();
-                        IMqttToken subToken = client.subscribe(topic,Qos);
-                        subToken.setActionCallback(new IMqttActionListener() {
-                            @Override
-                            public void onSuccess(IMqttToken asyncActionToken) {
-                                // The message was published
-                                Log.d("MQTT", "Subscribed");
-//                                Log.d("MQTT", msg.toString());
-//                                textView.setText(msg.toString());
-                            }
-
-                            @Override
-                            public void onFailure(IMqttToken asyncActionToken,
-                                                  Throwable exception) {
-                                Toast.makeText(MainActivity.this,"Failed to subscribe",Toast.LENGTH_LONG).show();
-                                // The subscription could not be performed, maybe the user was not
-                                // authorized to subscribe on the specified topic e.g. using wildcards
-                                Log.d("MQTT", "Failed to subscribe");
-
-                            }
-                        });
-                    } catch (MqttException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    // Something went wrong e.g. connection timeout or firewall problems
-                    Toast.makeText(MainActivity.this,"not connected",Toast.LENGTH_LONG).show();
-                    Log.d("MQTT", "onFailure");
-
-                }
-            });
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-
-        client.setCallback(new MqttCallback() {
+    private void startMqtt(){
+        mqttConnect = new mqttHelper(getApplicationContext());
+        mqttConnect.setCallback(new MqttCallback() {
             @Override
             public void connectionLost(Throwable cause) {
             startMqtt();
@@ -127,11 +60,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
             tv_x_value.setText(getX);
             tv_y_value.setText(getY);
+            tv_crash_pos.setText("TERJADI TABRAKAN");
 
-            LatLng sydney = new LatLng(getLat,getLong);
+            LatLng carPosition = new LatLng(getLat,getLong);
 
-                mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+                mMap.addMarker(new MarkerOptions().position(carPosition).title("Crash"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(carPosition));
 
             }
 
@@ -175,8 +109,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onDestroy() {
         super.onDestroy();
-        client.unregisterResources();
-        client.close();
+        mqttConnect.unregisterResources();
+        mqttConnect.close();
     }
 
     @Override
