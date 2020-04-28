@@ -3,6 +3,9 @@ package com.example.project1.helper;
 
 import android.content.Context;
 import android.util.Log;
+
+import com.example.project1.MainActivity;
+
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -107,9 +110,14 @@ public class mqttHelper {
         }
     }
 
+    public void registerResources() {
+    }
+
     public void unregisterResources() {
     }
 
     public void close() {
     }
+
+
 }
