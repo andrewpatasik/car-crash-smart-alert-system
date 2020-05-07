@@ -38,26 +38,26 @@
                     android:layout_marginLeft="30dp">
 
                     <LinearLayout
-                        android:background="@drawable/bg1"
-                        android:layout_width="match_parent"
+                        android:layout_width="248dp"
                         android:layout_height="match_parent"
+                        android:background="@drawable/bg1"
                         android:orientation="vertical">
 
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="30dp"
+                            android:layout_marginTop="10dp"
                             android:layout_marginRight="30dp"
-                            android:layout_marginTop="10dp">
+                            android:orientation="vertical">
 
                             <TextView
-                                android:textSize="12dp"
-                                android:textColor="#ffffff"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Data Akselerometer">
+                                android:text="Data Akselerometer"
+                                android:textColor="#ffffff"
+                                android:textSize="12dp">
 
                             </TextView>
 
@@ -67,61 +67,61 @@
                                 android:orientation="horizontal">
 
                                 <TextView
-                                    android:textSize="23dp"
-                                    android:textColor="#ffffff"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="X">
+                                    android:text="X"
+                                    android:textColor="#ffffff"
+                                    android:textSize="23dp">
 
                                 </TextView>
 
                                 <ImageView
-                                    android:src="@drawable/ic_action_name"
                                     android:layout_width="15dp"
                                     android:layout_height="15dp"
-                                    android:layout_marginTop="9dp"
                                     android:layout_marginLeft="5dp"
-                                    android:layout_marginRight="5dp">
+                                    android:layout_marginTop="9dp"
+                                    android:layout_marginRight="5dp"
+                                    android:src="@drawable/ic_action_name">
 
                                 </ImageView>
 
                                 <TextView
                                     android:id="@+id/tv_x_value"
-                                    android:textSize="23dp"
-                                    android:textColor="#ffffff"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="0.00">
+                                    android:text="0.00"
+                                    android:textColor="#ffffff"
+                                    android:textSize="23dp">
 
                                 </TextView>
 
                                 <ImageView
-                                    android:src="@drawable/ic_line"
                                     android:layout_width="15dp"
                                     android:layout_height="15dp"
-                                    android:layout_marginTop="9dp"
                                     android:layout_marginLeft="9dp"
+                                    android:layout_marginTop="9dp"
                                     android:layout_marginRight="9dp"
-                                    android:rotation="90">
+                                    android:rotation="90"
+                                    android:src="@drawable/ic_line">
 
                                 </ImageView>
 
                                 <TextView
-                                    android:textSize="23dp"
-                                    android:textColor="#ffffff"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Y">
+                                    android:text="Y"
+                                    android:textColor="#ffffff"
+                                    android:textSize="23dp">
 
                                 </TextView>
 
                                 <ImageView
-                                    android:src="@drawable/ic_action_name"
                                     android:layout_width="15dp"
                                     android:layout_height="15dp"
-                                    android:layout_marginTop="9dp"
                                     android:layout_marginLeft="5dp"
-                                    android:layout_marginRight="5dp">
+                                    android:layout_marginTop="9dp"
+                                    android:layout_marginRight="5dp"
+                                    android:src="@drawable/ic_action_name">
 
                                 </ImageView>
 
@@ -141,12 +141,12 @@
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="30dp"
+                            android:layout_marginTop="10dp"
                             android:layout_marginRight="30dp"
-                            android:layout_marginTop="10dp">
+                            android:orientation="vertical">
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
@@ -154,11 +154,11 @@
                                 android:orientation="vertical">
 
                                 <TextView
-                                    android:textSize="12dp"
-                                    android:textColor="#ffffff"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Posisi Tabrakan">
+                                    android:text="Posisi Tabrakan"
+                                    android:textColor="#ffffff"
+                                    android:textSize="12dp">
 
                                 </TextView>
 
@@ -173,7 +173,6 @@
                                 </TextView>
 
                             </LinearLayout>
-
 
 
                         </LinearLayout>
@@ -262,7 +261,31 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btn_save"
+                android:src="@drawable/ic_record"
+                android:layout_marginRight="30dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/btn_circle2"/>
+
+            <ImageButton
+                android:id="@+id/btn_call"
+                android:src="@drawable/ic_call"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="@drawable/btn_circle"/>
+
+            <ImageButton
+                android:id="@+id/btn_history"
+                android:src="@drawable/ic_list"
+                android:layout_marginLeft="30dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/btn_circle2"/>
 
 
         </LinearLayout>
