@@ -17,13 +17,9 @@ const char* mqtt_test_server = "192.168.0.106";
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 
-long lastMsg = 0;
-char msg[50];
-int value = 0;
-
 //For IP Static
 /*
-IPAddress ip(192, 168, 0, 112); // where xx is the desired IP Address
+IPAddress ip(192, 168, 0, 101); // where xx is the desired IP Address
 IPAddress gateway(192, 168, 0, 1); // set gateway to match your network
 IPAddress subnet(255, 255, 255, 0); // set subnet mask to match your network
 */
@@ -31,7 +27,7 @@ IPAddress subnet(255, 255, 255, 0); // set subnet mask to match your network
 //Define Sensor variable
 int16_t accelX, accelY, accelZ;
 float gForceX, gForceY, gForceZ;
-
+char buff[100];
 //long gyroX, gyroY, gyroZ;
 //float rotX, rotY, rotZ;
 
@@ -39,32 +35,24 @@ void setup() {
   Serial.begin(9600);    
   Wire.begin();
   setupWifi();
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
+  WiFi.mode(WIFI_STA);
   setupMPU();
-  while (Serial.available() > 0)                  //need to be fixed
-   if (gps.encode(Serial.read())){
-     Serial.println("Reading GPS.");
-     getCoordinate();      
-   }  
   mqttClient.setServer(mqtt_test_server, 1883);
-//client.setServer(mqtt_main_server, 1883);
-//client.setCallback(callback);  
   reconnect();
+  Serial.flush();
 }
 
 void loop() {
   recordAccelRegisters();
   //recordGyroRegisters();
-  delay(10);  
-   
-  readAndPublishData();   
-  //while (Serial.available() > 0){
-    //Serial.println("Reading GPS.");
-    //if (gps.encode(Serial.read()))
-       //getCoordinate();      
-  //}
-delay(100);
+  
+  while(Serial.available())//While there are characters to come from the GPS
+  {
+    gps.encode(Serial.read());//This feeds the serial NMEA data into the library one char at a time
+  }
+  monitorAccelData(); 
+//  if(gForceX == -4.00 || gForceX == 4.00 || gForceY == -4.00 || gForceY == 4.00)
+//    readAndPublishData();     
 }
 
 void setupWifi() {   
@@ -72,6 +60,7 @@ void setupWifi() {
   Serial.print(F("Setting static ip to : "));
   Serial.println(ip);
   */
+  
   // Connect to WiFi network
   Serial.println();
   Serial.println();
@@ -86,7 +75,10 @@ void setupWifi() {
     Serial.print(".");
   }
   Serial.println("");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
   Serial.println("WiFi connected"); 
+  
   delay(500);
 }
 
@@ -103,7 +95,7 @@ void setupMPU(){
   //Wire.endTransmission(); 
   Wire.beginTransmission(0b1101000); //I2C address of the MPU
   Wire.write(0x1C); //Accessing the register 1C - Acccelerometer Configuration (Sec. 4.5) 
-  Wire.write(0b00000000); //Setting the accel to +/- 2g
+  Wire.write(0b00000100); //Setting the accel to +/- 2g
   Serial.println("OK.");
   delay(500);
   Wire.endTransmission(); 
@@ -117,15 +109,63 @@ void recordAccelRegisters() {
   while(Wire.available() < 6);
   accelX = Wire.read()<<8|Wire.read(); //Store first two bytes into accelX
   accelY = Wire.read()<<8|Wire.read(); //Store middle two bytes into accelY
-  accelZ = Wire.read()<<8|Wire.read(); //Store last two bytes into accelZ
+  accelZ = Wire.read()<<8|Wire.read(); //Store last two bytes into accelZ  
+
   processAccelData();
 }
 
-void processAccelData(){                                                            //Set the sensor sensitivity
-  gForceX = accelX / 16384.0;                                                       //16384.0 = 1g
-  gForceY = accelY / 16384.0; 
-  gForceZ = accelZ / 16384.0;
+void processAccelData(){                                                            //
+  gForceX = accelX / 8192.0;                                                       //16384.0 = 1g
+  gForceY = accelY / 8192.0; 
+  gForceZ = accelZ / 8192.0;
+
 }
+
+void monitorAccelData(){                                                            //
+
+    if(gForceX >= -2.72 && gForceX <= 2.36 && gForceY >= -2.82 && gForceY <= 1.82) {
+    Serial.print(accelX);
+    Serial.print(",");
+    Serial.print(accelY);
+    Serial.print(",");
+    Serial.print(gForceX);
+    Serial.print(",");
+    Serial.print(gForceY);
+    Serial.print(","); 
+    Serial.println("Berjalan");
+    delay(100);
+    } 
+    
+    else if(gForceX >= -3.78 && gForceX <= 3.68 && gForceY >= -2.79 && gForceY <= 2.75) {
+    Serial.print(accelX);
+    Serial.print(",");
+    Serial.print(accelY);
+    Serial.print(",");
+    Serial.print(gForceX);
+    Serial.print(",");
+    Serial.print(gForceY);
+    Serial.print(","); 
+    Serial.println("Berhenti Mendadak");
+    delay(100);
+    }
+        
+    else if(gForceX >= -4.00 || gForceX <= 4.00 || gForceY >= -4.00 || gForceY <= 4.00) {
+    Serial.print(accelX);
+    Serial.print(",");
+    Serial.print(accelY);
+    Serial.print(",");
+    Serial.print(gForceX);
+    Serial.print(",");
+    Serial.print(gForceY);
+    Serial.print(","); 
+    Serial.println("Tabrakan");
+    readAndPublishData();     
+    delay(100);
+    }
+    //kasi else
+
+}
+
 /*
 void recordGyroRegisters() {
   Wire.beginTransmission(0b1101000); //I2C address of the MPU
@@ -145,37 +185,14 @@ void processGyroData() {
   rotZ = gyroZ / 131.0;
 }
 */
-/*
-void callback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message arrived [");
-  Serial.print(topic);
-  Serial.print("] ");
-  for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
-  }
-  Serial.println();
 
-  // Switch on the LED if an 1 was received as first character
-  if ((char)payload[0] == '1') {
-    digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on (Note that LOW is the voltage level
-    // but actually the LED is on; this is because
-    // it is acive low on the ESP-01)
-  } else {
-    digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
-  }
-
-}
-*/
 void reconnect() {
-  // Loop until we're reconnected
+  // Loop until reconnected
   while (!mqttClient.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
     if (mqttClient.connect("wifiClient")) {
       Serial.println("connected");
-      //mqttClient.publish("finalProject/MPU", "Listening.");      
-      // ... and resubscribe
-      //mqttClient.subscribe("finalProject/MPU");
     } else {
       Serial.print("failed, trying=");
       Serial.print(mqttClient.state());
@@ -187,12 +204,10 @@ void reconnect() {
 }
 
 void readAndPublishData() {    
-  if(mqttClient.connect("wifiClient")) {    
-     
-    if( gForceX > 0.50 || gForceX < -0.50 ) {
-      Serial.println("[TEST] Rear-Side Accident Occured");
-      delay(1000);
-      Serial.println("Get Accelerometer Data...");
+  if(mqttClient.connect("wifiClient")) {      
+      Serial.println("[ALERT] Accident Occured");
+      delay(3000);
+      Serial.println("Preparing To Send Data...");
       StaticJsonBuffer<300> JSONbuffer;
       JsonObject& JSONencoder = JSONbuffer.createObject();
       JSONencoder["Device"] = "Wemos D1 R1";
@@ -204,128 +219,14 @@ void readAndPublishData() {
       char JSONmessageBuffer[100];
       JSONencoder.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
       Serial.println(JSONmessageBuffer);
-      delay(1000);
+      Serial.print("OK...");
+      Serial.println();
+      delay(3000);
       Serial.println("Publishing Data...");
       mqttClient.publish("finalProject/MPU", JSONmessageBuffer);      
-      delay(1000);
+      delay(3000);
       Serial.println("-Sent.");
       reconnect();
-    } else if( gForceY > 0.50 || gForceY < -0.50 ) {
-      Serial.println("[TEST] Front-Side Accident Occured");
-      delay(1000);
-      Serial.println("Get Accelerometer Data...");
-      StaticJsonBuffer<300> JSONbuffer;
-      JsonObject& JSONencoder = JSONbuffer.createObject();
-      JSONencoder["Device"] = "Wemos D1 R1";
-      JsonObject& data = JSONencoder.createNestedObject("data");
-      data.set("X-Axis",gForceX);
-      data.set("Y-Axis",gForceY);
-      data.set("Lat",gps.location.lat(), 6);
-      data.set("Long",gps.location.lng(), 6);
-      char JSONmessageBuffer[100];
-      JSONencoder.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
-      Serial.println(JSONmessageBuffer);
-      delay(1000);
-      Serial.println("Publishing Data...");
-      mqttClient.publish("finalProject/MPU", JSONmessageBuffer);      
-      delay(1000);
-      Serial.println("-Sent.");    
-      reconnect();
+      Serial.flush();
     }
   }
-
-/*
-  if(client.connected()) {
-  if (gForceX > 0.50 || gForceX < -0.50 || gForceY > 0.50 || gForceY < -0.50) {
-  while (Serial.available() > 0)
-    if (gps.encode(Serial.read()))
-      displayInfo();
-  }
-  delay(100);
-  */
-}
-/*
-void readAndPublishData() {    
-  if(mqttClient.connect("wifiClient")) {    
-     
-    if( gForceX > 0.50 || gForceX < -0.50 ) {
-      Serial.println("[TEST] Accident Occured");
-      delay(1000);
-      Serial.println("Get Accelerometer Data...");
-      String getSensorData = String(gForceX) + "," + String(gForceY) + "," + "Rear-Side Crash ";
-      char sensorDataAsCharAway[getSensorData.length()];
-      getSensorData.toCharArray(sensorDataAsCharAway, getSensorData.length());
-      Serial.println(getSensorData);
-      delay(1000);
-      Serial.println("Publishing Data...");
-      mqttClient.publish("finalProject/MPU", sensorDataAsCharAway);      
-      delay(1000);
-      Serial.println("-Sent.");
-    } else if( gForceY > 0.50 || gForceY < -0.50 ) {
-      Serial.println("[TEST] Accident Occured");
-      delay(1000);
-      Serial.println("Get Accelerometer Data...");
-      String getSensorData = String(gForceX) + "," + String(gForceY) + "," + "Front-Side Crash ";
-      char sensorDataAsCharAway[getSensorData.length()];
-      getSensorData.toCharArray(sensorDataAsCharAway, getSensorData.length());
-      Serial.println(getSensorData);
-      delay(1000);
-      Serial.println("Publishing Data...");
-      mqttClient.publish("finalProject/MPU", sensorDataAsCharAway);
-      delay(1000);
-      Serial.println("-Sent.");    }
-  }
-*/
-
-void getCoordinate()
-{
-  Serial.print(F("Location: ")); 
-  if (gps.location.isValid())
-  {
-    Serial.print(gps.location.lat(), 6);
-    Serial.print(F(","));
-    Serial.print(gps.location.lng(), 6);
-  }
-  else
-  {
-    Serial.print(F("INVALID"));
-  }
-
-  Serial.print(F("  Date/Time: "));
-  if (gps.date.isValid())
-  {
-    Serial.print(gps.date.month());
-    Serial.print(F("/"));
-    Serial.print(gps.date.day());
-    Serial.print(F("/"));
-    Serial.print(gps.date.year());
-  }
-  else
-  {
-    Serial.print(F("INVALID"));
-  }
-
-  Serial.print(F(" "));
-  if (gps.time.isValid())
-  {
-    if (gps.time.hour() < 10) Serial.print(F("0"));
-    Serial.print(gps.time.hour());
-    Serial.print(F(":"));
-    if (gps.time.minute() < 10) Serial.print(F("0"));
-    Serial.print(gps.time.minute());
-    Serial.print(F(":"));
-    if (gps.time.second() < 10) Serial.print(F("0"));
-    Serial.print(gps.time.second());
-    Serial.print(F("."));
-    if (gps.time.centisecond() < 10) Serial.print(F("0"));
-    Serial.print(gps.time.centisecond());
-  }
-  else
-  {
-    Serial.print(F("INVALID"));
-  }
-
-  Serial.println();
-
-}
-

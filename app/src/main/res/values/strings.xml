@@ -1,4 +1,21 @@
 <resources>
     <string name="app_name">project1</string>
     <string name="google_maps_API_key">AIzaSyBOKOu6LhEiIywqurDzXAZGYsRp6mxIuLM</string>
+
+    <string name="empty_view">TIDAK ADA DATA</string>
+    <string name="accelerometer">Data Akselerometer</string>
+    <string name="pointer_x">X</string>
+    <string name="x_value">0.00</string>
+    <string name="pointer_y">Y</string>
+    <string name="y_value">0.00</string>
+    <string name="driver_pointer">Nama Pengemudi</string>
+    <string name="driver_value">Tobey Marshall</string>
+    <string name="timestamp_pointer">Waktu Kejadian</string>
+    <string name="timestamp_value">07.00</string>
+    <string name="car_pointer">Tipe Mobil</string>
+    <string name="car_value">Ford Shelby</string>
+    <string name="separator">separator</string>
+    <string name="arrow1">arrow1</string>
+    <string name="arrow2">arrow2</string>
+    <string name="sos_call">sos_call</string>
 </resources>

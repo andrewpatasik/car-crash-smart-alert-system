@@ -9,7 +9,7 @@ import com.example.project1.DataTabrakan.*;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TAG = "DATABASE_HELPER";
-    public static final String DATABASE_NAME = "datatabrakan.db";
+    public static final String DATABASE_NAME = "testdatatabrakan.db";
     public static final int DATABASE_VERSION = 1;
 
     public DatabaseHelper(Context context) {
@@ -21,6 +21,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_DATATABRAKAN_TABLE = "CREATE TABLE " +
                 TabrakanEntry.TABLE_NAME + " (" +
                 TabrakanEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                TabrakanEntry.COLUMN_DRIVER + " TEXT NOT NULL, " +
+                TabrakanEntry.COLUMN_CAR + " TEXT NOT NULL, " +
                 TabrakanEntry.COLUMN_X + " TEXT NOT NULL, " +
                 TabrakanEntry.COLUMN_Y + " TEXT NOT NULL, " +
                 TabrakanEntry.COLUMN_LAT + " DOUBLE NOT NULL, " +

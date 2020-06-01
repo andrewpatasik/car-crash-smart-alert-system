@@ -8,6 +8,8 @@ public class DataTabrakan {
 
     public static final class TabrakanEntry implements BaseColumns{
         public static final String TABLE_NAME = "tabrakan";         //nama tabel
+        public static final String COLUMN_DRIVER = "nama_driver";
+        public static final String COLUMN_CAR = "tipe_mobil";
         public static final String COLUMN_X = "sumbu_x";         //nama kolom pertama
         public static final String COLUMN_Y = "sumbu_y";
         public static final String COLUMN_LAT = "latitude";

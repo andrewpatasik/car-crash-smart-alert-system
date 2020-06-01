@@ -8,12 +8,15 @@ import androidx.fragment.app.FragmentActivity;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Bundle;
+import android.os.strictmode.IntentReceiverLeakedViolation;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -41,14 +44,15 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
     mqttHelper mqttConnect;
-    TextView tv_crash_pos;
     GoogleMap mMap;
     LinearLayout main_view;
     TextView empty_view;
-    ImageButton btnSave;
-    ImageButton btnHistory;
+    ImageButton emergency_call;
 
     private NotificationManagerCompat notificationManager;
     private SQLiteDatabase mDatabase;
@@ -63,10 +67,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         main_view = findViewById(R.id.main_view);
         empty_view = findViewById(R.id.empty_view);
-        tv_crash_pos = findViewById(R.id.tv_crash_pos);
-
-        btnSave = findViewById(R.id.btn_save);
-        btnHistory = findViewById(R.id.btn_history);
+        emergency_call = findViewById(R.id.btn_call);
 
         main_view.setVisibility(View.GONE);
         empty_view.setVisibility(View.VISIBLE);
@@ -79,7 +80,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         notificationManager = NotificationManagerCompat.from(this);
 
-
+        emergency_call.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent dialNumberIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:085695771804"));
+                startActivity(dialNumberIntent);
+            }
+        });
 
     }
 
@@ -103,8 +110,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             final double getLong = getData.getDouble("Long");
             Log.d("MQTT","payload: " + jsonmsg);
 
+            String driverDetail = "Tobey Marshall";
+            String carType = "Ford Shelby";
+
             //Insert to DB
             ContentValues cv = new ContentValues();
+            cv.put(DataTabrakan.TabrakanEntry.COLUMN_DRIVER, driverDetail);
+            cv.put(DataTabrakan.TabrakanEntry.COLUMN_CAR, carType);
             cv.put(DataTabrakan.TabrakanEntry.COLUMN_X, getX);
             cv.put(DataTabrakan.TabrakanEntry.COLUMN_Y, getY);
             cv.put(DataTabrakan.TabrakanEntry.COLUMN_LAT, getLat);
@@ -114,7 +126,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             Log.d("MQTT","DB_TRANSACTION: " + cv);
 
             updateView(getX,getY,getLat,getLong);
-            tv_crash_pos.setText("TERJADI TABRAKAN");
             createNotification();
             }
 
@@ -131,6 +142,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         final double tempGetLat = getLat;
         final double tempGetLong = getLong;
 
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+        final String time = format.format(calendar.getTime());
+
         try {
             runOnUiThread(new Runnable() {
                 @Override
@@ -140,12 +155,15 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
                     TextView tv_x_value;
                     TextView tv_y_value;
+                    TextView tv_timestamp;
 
                     tv_x_value = findViewById(R.id.tv_x_value);
                     tv_y_value = findViewById(R.id.tv_y_value);
+                    tv_timestamp = findViewById(R.id.tv_time);
 
                     tv_x_value.setText(tempGetX);
                     tv_y_value.setText(tempGetY);
+                    tv_timestamp.setText(time);
 
                     LatLng carPosition = new LatLng(tempGetLat,tempGetLong);
 
@@ -160,12 +178,18 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void createNotification(){
+
+        Intent activityIntent = new Intent(this, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this,
+                0, activityIntent, 0);
+
         Notification notification = new NotificationCompat.Builder(this, App.CHANNEL_1_ID)
                 .setSmallIcon(R.drawable.ic_notif)
-                .setContentTitle("Notification")
-                .setContentText("Crash Occured")
+                .setContentTitle("Notifikasi Tabrakan")
+                .setContentText("Tabrakan telah teridentifikasi")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .setContentIntent(contentIntent)
                 .build();
 
         notificationManager.notify(1,notification);
@@ -174,7 +198,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onResume() {
         super.onResume();
-    mqttConnect.registerResources();
+        mqttConnect.registerResources(this);
     }
 
     @Override
@@ -190,10 +214,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        // Add a marker in Sydney, Australia, and move the camera.
-        //LatLng sydney = new LatLng(-34, 151);
-
     }
 
     @Override
@@ -204,7 +224,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mqttConnect.unregisterResources();
+        mqttConnect.unregisterResources(this);
         mqttConnect.close();
     }
 

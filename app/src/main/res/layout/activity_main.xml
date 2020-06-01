@@ -18,7 +18,7 @@
             android:id="@+id/mapView"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="350dp"
             />
 
         <HorizontalScrollView
@@ -38,7 +38,7 @@
                     android:layout_marginLeft="30dp">
 
                     <LinearLayout
-                        android:layout_width="248dp"
+                        android:layout_width="268dp"
                         android:layout_height="match_parent"
                         android:background="@drawable/bg1"
                         android:orientation="vertical">
@@ -55,9 +55,9 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Data Akselerometer"
+                                android:text="@string/accelerometer"
                                 android:textColor="#ffffff"
-                                android:textSize="12dp">
+                                android:textSize="12sp">
 
                             </TextView>
 
@@ -69,9 +69,9 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="X"
+                                    android:text="@string/pointer_x"
                                     android:textColor="#ffffff"
-                                    android:textSize="23dp">
+                                    android:textSize="23sp">
 
                                 </TextView>
 
@@ -81,7 +81,8 @@
                                     android:layout_marginLeft="5dp"
                                     android:layout_marginTop="9dp"
                                     android:layout_marginRight="5dp"
-                                    android:src="@drawable/ic_action_name">
+                                    android:src="@drawable/ic_action_name"
+                                    android:contentDescription="@string/arrow1">
 
                                 </ImageView>
 
@@ -89,13 +90,14 @@
                                     android:id="@+id/tv_x_value"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="0.00"
+                                    android:text="@string/x_value"
                                     android:textColor="#ffffff"
-                                    android:textSize="23dp">
+                                    android:textSize="23sp">
 
                                 </TextView>
 
                                 <ImageView
+                                    android:contentDescription="@string/separator"
                                     android:layout_width="15dp"
                                     android:layout_height="15dp"
                                     android:layout_marginLeft="9dp"
@@ -109,13 +111,14 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Y"
+                                    android:text="@string/pointer_y"
                                     android:textColor="#ffffff"
-                                    android:textSize="23dp">
+                                    android:textSize="23sp">
 
                                 </TextView>
 
                                 <ImageView
+                                    android:contentDescription="@string/arrow2"
                                     android:layout_width="15dp"
                                     android:layout_height="15dp"
                                     android:layout_marginLeft="5dp"
@@ -129,9 +132,9 @@
                                     android:id="@+id/tv_y_value"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="0.00"
+                                    android:text="@string/y_value"
                                     android:textColor="#ffffff"
-                                    android:textSize="23dp">
+                                    android:textSize="23sp">
 
                                 </TextView>
 
@@ -156,19 +159,19 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Posisi Tabrakan"
+                                    android:text="@string/driver_pointer"
                                     android:textColor="#ffffff"
-                                    android:textSize="12dp">
+                                    android:textSize="12sp">
 
                                 </TextView>
 
                                 <TextView
-                                    android:id="@+id/tv_crash_pos"
+                                    android:id="@+id/tv_driver"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="TIDAK ADA DATA"
+                                    android:text="@string/driver_value"
                                     android:textColor="#ffffff"
-                                    android:textSize="22dp">
+                                    android:textSize="22sp">
 
                                 </TextView>
 
@@ -204,11 +207,11 @@
                             android:layout_marginTop="10dp">
 
                             <TextView
-                                android:textSize="12dp"
+                                android:textSize="12sp"
                                 android:textColor="#ffffff"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Waktu Kejadian">
+                                android:text="@string/timestamp_pointer">
 
                             </TextView>
 
@@ -218,11 +221,12 @@
                                 android:orientation="horizontal">
 
                                 <TextView
-                                    android:textSize="23dp"
+                                    android:id="@+id/tv_time"
+                                    android:textSize="23sp"
                                     android:textColor="#ffffff"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="07.00">
+                                    android:text="@string/timestamp_value">
 
                                 </TextView>
 
@@ -238,17 +242,33 @@
                             android:layout_marginRight="30dp"
                             android:layout_marginTop="10dp">
 
+                            <TextView
+                                android:textSize="12sp"
+                                android:textColor="#ffffff"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/car_pointer">
+
+                            </TextView>
+
                             <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical">
+                                android:orientation="horizontal">
 
+                                <TextView
+                                    android:id="@+id/tv_car"
+                                    android:textSize="23sp"
+                                    android:textColor="#ffffff"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/car_value">
 
+                                </TextView>
 
                             </LinearLayout>
 
                         </LinearLayout>
-
 
                     </LinearLayout>
 
@@ -265,28 +285,12 @@
             android:orientation="horizontal">
 
             <ImageButton
-                android:id="@+id/btn_save"
-                android:src="@drawable/ic_record"
-                android:layout_marginRight="30dp"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:background="@drawable/btn_circle2"/>
-
-            <ImageButton
+                android:contentDescription="@string/sos_call"
                 android:id="@+id/btn_call"
                 android:src="@drawable/ic_call"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:background="@drawable/btn_circle"/>
-
-            <ImageButton
-                android:id="@+id/btn_history"
-                android:src="@drawable/ic_list"
-                android:layout_marginLeft="30dp"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:background="@drawable/btn_circle2"/>
-
+                android:background="@drawable/btn_circle"/>
 
         </LinearLayout>
 
@@ -298,7 +302,7 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:visibility="gone"
-        android:text="No data."/>
+        android:text="@string/empty_view"/>
 
 
 </LinearLayout>

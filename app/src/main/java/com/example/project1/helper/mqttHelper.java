@@ -52,9 +52,7 @@ public class mqttHelper {
     }
 
     private void connect() {
-
-
-
+        mqttConnectOptions.setAutomaticReconnect(true);
         try {
             IMqttToken token = client.connect();
             token.setActionCallback(new IMqttActionListener() {
@@ -110,10 +108,10 @@ public class mqttHelper {
         }
     }
 
-    public void registerResources() {
+    public void registerResources(MainActivity mainActivity) {
     }
 
-    public void unregisterResources() {
+    public void unregisterResources(MainActivity mainActivity) {
     }
 
     public void close() {
